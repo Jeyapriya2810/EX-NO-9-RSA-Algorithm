@@ -36,12 +36,96 @@ Step 5: **Security Foundation
 The security of RSA relies on the difficulty of factoring large numbers; thus, choosing sufficiently large prime numbers for \( p \) and \( q \) is crucial for security.
 
 ## Program:
+```
+#include <stdio.h>
+#include <string.h>
 
+int gcd(int a, int b) {
+    while(b != 0) {
+        int temp = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
 
+long long modPower(long long base, long long exp, long long mod) {
+    long long result = 1;
 
+    while(exp > 0) {
+        result = (result * base) % mod;
+        exp--;
+    }
+
+    return result;
+}
+
+int modInverse(int e, int phi) {
+    for(int d = 1; d < phi; d++) {
+        if((d * e) % phi == 1)
+            return d;
+    }
+
+    return -1;
+}
+
+int main() {
+    int p, q, n, phi, e, d;
+    char msg[100];
+    long long enc[100];
+    char dec[100];
+
+    printf("Enter first prime number: ");
+    scanf("%d", &p);
+
+    printf("Enter second prime number: ");
+    scanf("%d", &q);
+
+    getchar();
+
+    n = p * q;
+    phi = (p - 1) * (q - 1);
+
+    for(e = 2; e < phi; e++) {
+        if(gcd(e, phi) == 1)
+            break;
+    }
+
+    d = modInverse(e, phi);
+
+    printf("\nPublic Key = (%d, %d)\n", e, n);
+    printf("Private Key = (%d, %d)\n", d, n);
+
+    printf("\nEnter message: ");
+    fgets(msg, sizeof(msg), stdin);
+
+    msg[strcspn(msg, "\n")] = 0;
+
+    // Encryption
+    for(int i = 0; i < strlen(msg); i++) {
+        enc[i] = modPower(msg[i], e, n);
+    }
+
+    printf("\nEncrypted Message:\n");
+    for(int i = 0; i < strlen(msg); i++) {
+        printf("%lld ", enc[i]);
+    }
+
+    // Decryption
+    for(int i = 0; i < strlen(msg); i++) {
+        dec[i] = (char)modPower(enc[i], d, n);
+    }
+
+    dec[strlen(msg)] = '\0';
+
+    printf("\n\nDecrypted Message: %s\n", dec);
+
+    return 0;
+}
+```
 
 ## Output:
-
+<img width="1612" height="847" alt="image" src="https://github.com/user-attachments/assets/14c7b0a0-411a-44f0-99ff-e49d21b9fc31" />
 
 
 ## Result:
